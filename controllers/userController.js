@@ -1,11 +1,24 @@
 const User = require('../models/User')
 //ES6 syntax
 
+const mustBeLoggedIn = (req, res, next) => {
+    //There is a session with a user looged in
+    if (req.session.user) {
+        next()
+    } else {
+        req.flash('errors', 'You must be logged in to perform that action.')
+        //Save our session data before redirecting
+        req.session.save( () => {
+            res.redirect('/')
+        })
+    }
+}
+
 const login = (req, res) => { 
     let user = new User(req.body)
     //Making a Promise
-    user.login().then( (result) => {
-        req.session.user = {username: user.data.username, favColor: "blue"}
+    user.login().then( () => {
+        req.session.user = {username: user.data.username, avatar: user.avatar, _id: user.data._id}
         req.session.save( () => {
             res.redirect('/')
         })
@@ -29,7 +42,7 @@ const logout = (req, res) => {
 const register = (req, res) => {
     let user = new User(req.body)
     user.register().then( () => {
-        req.session.user = {username: user.data.username}
+        req.session.user = {username: user.data.username, avatar: user.avatar, _id: user.data._id}
         req.session.save( () => {
             res.redirect('/')
         })
@@ -46,11 +59,14 @@ const register = (req, res) => {
  const home = (req, res) => { 
      //If there is a session associated to the browser data
     if (req.session.user) {
-        res.render('home-dashboard', {username: req.session.user.username})
+        // res.render('home-dashboard', {username: req.session.user.username, avatar: req.session.user.avatar}) **no longer need to export session date from here
+        res.render('home-dashboard')
     } else {
         res.render('home-guest', {errors: req.flash('errors'), regErrors: req.flash('regErrors')})
     }
 }
 
-module.exports = { login, logout, register, home }
+
+
+module.exports = { login, logout, register, home, mustBeLoggedIn }
 

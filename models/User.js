@@ -7,6 +7,9 @@ const usersCollection = require('../db').db().collection('users')
 //Require the validator
 const validator = require('validator')
 
+//Require the hashing package md5
+const md5 = require('md5')
+
 //Constructor function for User
 let User = function(data) {
     this.data = data
@@ -124,6 +127,7 @@ User.prototype.register = function() {
                 let salt = bcrypt.genSaltSync(10)
                 this.data.password = bcrypt.hashSync(this.data.password, salt)
                 await usersCollection.insertOne(this.data)
+                this.getAvatar()
                 resolve()
             } else {
                 //There are errors in the promise
@@ -140,15 +144,25 @@ User.prototype.login = function() {
         this.cleanUp()
 
         //Find a matching username in the database
-        usersCollection.findOne({username: this.data.username}, (err, attempedUser) => {
+        usersCollection.findOne({username: this.data.username}).then( (attemptedUser) => {
             //The arrow function guarantees that the 'this' keyword points towards the current object and not to the global object
-            if (attempedUser && bcrypt.compareSync(this.data.password, attempedUser.password) ){
+            if (attemptedUser && bcrypt.compareSync(this.data.password, attemptedUser.password) ){
+                this.data = attemptedUser
+                this.getAvatar()
                 resolve('Congrats!!!')
             } else {
                 reject('Invalid username / password')
             }
+        }).catch(() => {
+            reject("Please try again later.")
         })
     })
+}
+
+
+
+User.prototype.getAvatar = function() {
+    this.avatar = `https://secure.gravatar.com/avatar/${md5(this.data.email)}?s=128`
 }
 
 module.exports = User

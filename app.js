@@ -28,6 +28,13 @@ app.use(sessionOptions)
 //Enable flash messages
 app.use(flash())
 
+//Tell Express to run this function for every request
+app.use( function(req, res, next) {
+    //Here we include our user data to have access to it within every local template
+    res.locals.user = req.session.user
+    next()
+})
+
 //Require the router file
 const router = require('./router')
 
