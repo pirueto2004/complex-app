@@ -14,8 +14,13 @@ const viewCreateScreen = (req, res) => {
     })
  }
 
- const viewSingle = (req, res) => {
-     res.render('single-post-screen')
+ const viewPost = async (req, res) => {
+    try {
+        let post = await Post.findPostById(req.params.id)
+        res.render('single-post-screen', {post: post})
+    } catch {
+        res.render('404')
+    }
  }
 
- module.exports = {viewCreateScreen, create, viewSingle}
+ module.exports = {viewCreateScreen, create, viewPost}

@@ -11,9 +11,11 @@ const validator = require('validator')
 const md5 = require('md5')
 
 //Constructor function for User
-let User = function(data) {
+let User = function(data, getAvatar) {
     this.data = data
     this.errors = []
+    if (getAvatar == undefined) { getAvatar = false }
+    if (getAvatar) {this.getAvatar()}
 }
 
 User.prototype.cleanUp = function() {

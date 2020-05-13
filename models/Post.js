@@ -1,6 +1,7 @@
 const postsCollection = require('../db').db().collection('posts')
 //Require ObjectID from mongodb
 const ObjectID = require('mongodb').ObjectID
+const User = require('./User')
 
 let Post = function(data, userID) {
     this.data = data
@@ -43,6 +44,42 @@ Post.prototype.create = function() {
            
         } else {
             reject(this.errors)
+        }
+    })
+}
+
+Post.findPostById = function(id) {
+    return new Promise( async (resolve, reject) => {
+        if (typeof(id) !== 'string' || !ObjectID.isValid(id)) {
+            reject()
+            return
+        }
+        let posts = await postsCollection.aggregate([
+            //Perfoms a match for the requested id
+            {$match: {_id: new ObjectID(id)}},
+            {$lookup: {from: 'users', localField: 'author', foreignField: '_id', as: 'authorDocument'}},
+            {$project: {
+                title: 1,
+                body: 1,
+                createdDate: 1,
+                author: {$arrayElemAt: ['$authorDocument', 0]}
+            }}
+        ]).toArray()
+
+        // Cleanup author property in ach post object
+        posts = posts.map( function(post) {
+            post.author = {
+                username: post.author.username,
+                avatar: new User(post.author, true).avatar
+            }
+            return post
+        })
+
+        if (posts.length) {
+            console.log(posts[0])
+            resolve(posts[0])
+        } else {
+            reject()
         }
     })
 }
