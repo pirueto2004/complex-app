@@ -3,10 +3,11 @@ const postsCollection = require('../db').db().collection('posts')
 const ObjectID = require('mongodb').ObjectID
 const User = require('./User')
 
-let Post = function(data, userID) {
+let Post = function(data, userID, requestedPostId) {
     this.data = data
     this.errors = []
     this.userID = userID
+    this.requestedPostId = requestedPostId
 }
 
 Post.prototype.cleanUp = function() {
@@ -48,32 +49,79 @@ Post.prototype.create = function() {
     })
 }
 
-Post.findPostById = function(id) {
+Post.prototype.update = function() {
     return new Promise( async (resolve, reject) => {
-        if (typeof(id) !== 'string' || !ObjectID.isValid(id)) {
+        try {
+            let post = await Post.findPostById(this.requestedPostId, this.userID)
+            //if visitor is the author of the post
+            if (post.isVisitorOwner) {
+                //actually update the db
+                let status = await this.updateDB()
+                resolve(status)
+            //Otherwise
+            } else {
+                reject()
+            }
+        } catch {
             reject()
-            return
         }
-        let posts = await postsCollection.aggregate([
-            //Perfoms a match for the requested id
-            {$match: {_id: new ObjectID(id)}},
+    })
+}
+
+Post.prototype.updateDB = function() {
+    return new Promise( async (resolve, reject) => {
+        this.cleanUp()
+        this.validate()
+        //If there are no errors
+        if (!this.errors.length) {
+            await postsCollection.findOneAndUpdate({_id: new ObjectID(this.requestedPostId)}, {$set: {title: this.data.title, body: this.data.body}})
+            resolve('success')
+        } else {
+            resolve('failure')
+        }
+    })
+}
+
+Post.resusablePostQuery = function(uniqueOperations, visitorId) {
+    return new Promise( async (resolve, reject) => {
+        
+        let aggOperations = uniqueOperations.concat([
             {$lookup: {from: 'users', localField: 'author', foreignField: '_id', as: 'authorDocument'}},
             {$project: {
                 title: 1,
                 body: 1,
                 createdDate: 1,
+                authorId: '$author',
                 author: {$arrayElemAt: ['$authorDocument', 0]}
             }}
-        ]).toArray()
+        ])
+            let posts = await postsCollection.aggregate(aggOperations).toArray()
 
         // Cleanup author property in ach post object
         posts = posts.map( function(post) {
+            //Check if the visitor id matches the author id of current post
+            post.isVisitorOwner = post.authorId.equals(visitorId)
             post.author = {
                 username: post.author.username,
                 avatar: new User(post.author, true).avatar
             }
             return post
         })
+
+        resolve(posts)
+    })
+}
+
+Post.findPostById = function(id, visitorId) {
+    return new Promise( async (resolve, reject) => {
+        if (typeof(id) !== 'string' || !ObjectID.isValid(id)) {
+            reject()
+            return
+        }
+        
+        let posts = await Post.resusablePostQuery([
+            {$match: {_id: new ObjectID(id)}}
+        ], visitorId)
 
         if (posts.length) {
             console.log(posts[0])
@@ -82,6 +130,13 @@ Post.findPostById = function(id) {
             reject()
         }
     })
+}
+
+Post.findByAuthorId = function(authorId) {
+    return Post.resusablePostQuery([
+        {$match: {author: authorId}},
+        {$sort: {createdDate: -1}}
+    ])
 }
 
 module.exports = Post

@@ -30,7 +30,18 @@ app.use(flash())
 
 //Tell Express to run this function for every request
 app.use( function(req, res, next) {
-    //Here we include our user data to have access to it within every local template
+
+    //Make all error and success flash messages available from all templates
+    res.locals.errors = req.flash('errors')
+    res.locals.success = req.flash('success')
+
+    //Make current user id available on the request object
+    if (req.session.user) {
+        req.visitorId = req.session.user._id
+    } else {
+        req.visitorId = 0
+    }
+    //Here we include our user data to make them available from within every local template
     res.locals.user = req.session.user
     next()
 })
