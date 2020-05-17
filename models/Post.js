@@ -1,7 +1,8 @@
-const postsCollection = require('../db').db().collection('posts')
-//Require ObjectID from mongodb
-const ObjectID = require('mongodb').ObjectID
-const User = require('./User')
+const   postsCollection = require('../db').db().collection('posts'),
+        //Require ObjectID from mongodb
+        ObjectID = require('mongodb').ObjectID,
+        User = require('./User'),
+        sanitizeHTML = require('sanitize-html')
 
 let Post = function(data, userID, requestedPostId) {
     this.data = data
@@ -17,8 +18,8 @@ Post.prototype.cleanUp = function() {
     //Get rid of any bogus properties that user may enter
     //so we overwrite the data property and trim any empty spaces at the beginning or end of the string and convert to lower cases
     this.data = {
-        title: this.data.title.trim(),
-        body: this.data.body.trim(),
+        title: sanitizeHTML(this.data.title.trim(), {allowedTags: [], allowedAttributes: {}}),
+        body: sanitizeHTML(this.data.body.trim(), {allowedTags: [], allowedAttributes: {}}),
         createdDate: new Date(),
         author: ObjectID(this.userID)
     }
@@ -35,8 +36,8 @@ Post.prototype.create = function() {
         this.validate()
         if (!this.errors.length) {
             //save post into database
-            postsCollection.insertOne(this.data).then( () => {
-                resolve()
+            postsCollection.insertOne(this.data).then( (info) => {
+                resolve(info.ops[0]._id)
             }).catch( () => {
                 //Errors here are related to problems with the MongoDB processing or database connection problems
                 this.errors.push("Please try again later")
@@ -137,6 +138,25 @@ Post.findByAuthorId = function(authorId) {
         {$match: {author: authorId}},
         {$sort: {createdDate: -1}}
     ])
+}
+
+Post.delete = function(postIdToDelete, currentUserId) {
+    return new Promise( async (resolve, reject) => {
+        try {
+            let post = await Post.findPostById(postIdToDelete, currentUserId)
+            if (post.isVisitorOwner) {
+                await postsCollection.deleteOne({_id: new ObjectID(postIdToDelete)})
+                resolve()
+            } else {
+                //If someone is trying to delete a post they do not own
+                reject()
+            }
+        } catch {
+            //It means that the post id is not valid or post does not exist
+            reject()
+        }
+
+    })
 }
 
 module.exports = Post

@@ -1,14 +1,15 @@
 //Require the express module
-const express = require('express')
-
+const   express = require('express'),
 //Require the session module
-const session = require('express-session')
-
+        session = require('express-session'),
 //Require package for saving sessions in MongoDB database
-const MongoStore = require('connect-mongo')(session)
-
+        MongoStore = require('connect-mongo')(session),
 //Require package for flash messages
-const flash = require('connect-flash')
+        flash = require('connect-flash'),
+//Require the markdown package
+        markdown = require('marked'),
+//Require the sanitize-html package
+        sanitizeHTML = require('sanitize-html')
 
 //Create our express server
 const app = express()
@@ -30,6 +31,14 @@ app.use(flash())
 
 //Tell Express to run this function for every request
 app.use( function(req, res, next) {
+
+    //Make markdown function available from within ejs templates
+    res.locals.filterUserHTML = content => {
+        return sanitizeHTML(markdown(content), {
+            allowedTags: ['a', 'p', 'br', 'ul', 'ol', 'li', 'strong', 'bold', 'em', 'i', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+            allowedAttributes: {}
+        })
+    }
 
     //Make all error and success flash messages available from all templates
     res.locals.errors = req.flash('errors')
