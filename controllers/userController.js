@@ -1,5 +1,7 @@
 const User = require('../models/User')
 const Post = require('../models/Post')
+const Follow = require('../models/Follow')
+
 //ES6 syntax
 
 const mustBeLoggedIn = (req, res, next) => {
@@ -82,13 +84,24 @@ const profilePostsScreen = (req, res) => {
         res.render('profile', {
             posts: posts,
             profileUsername: req.profileUser.username,
-            profileAvatar: req.profileUser.avatar
+            profileAvatar: req.profileUser.avatar,
+            isFollowing: req.isFollowing
         })
     }).catch( () => {
         res.render('404')
     })
 }
 
+const sharedProfileData = async (req, res, next) => {
+    let isFollowing = false
+    if (req.session.user) {
+        isFollowing = await Follow.isVisitorFollowing(req.profileUser._id, req.visitorId)
+    }
 
-module.exports = { login, logout, register, home, mustBeLoggedIn, ifUserExists, profilePostsScreen }
+    req.isFollowing = isFollowing
+    next()
+}
+
+
+module.exports = { login, logout, register, home, mustBeLoggedIn, ifUserExists, profilePostsScreen, sharedProfileData }
 

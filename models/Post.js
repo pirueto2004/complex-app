@@ -102,6 +102,8 @@ Post.resusablePostQuery = function(uniqueOperations, visitorId) {
         posts = posts.map( function(post) {
             //Check if the visitor id matches the author id of current post
             post.isVisitorOwner = post.authorId.equals(visitorId)
+            //Strip out the authorId from the post data sent to the browser
+            post.authorId = undefined
             post.author = {
                 username: post.author.username,
                 avatar: new User(post.author, true).avatar
@@ -156,6 +158,20 @@ Post.delete = function(postIdToDelete, currentUserId) {
             reject()
         }
 
+    })
+}
+
+Post.search = function(searchTerm) {
+    return new Promise( async (resolve, reject) => {
+        if (typeof(searchTerm) == "string") {
+            let posts = await Post.resusablePostQuery([
+                {$match: {$text: {$search: searchTerm}}},
+                {$sort: {score: {$meta: "textScore"}}}
+            ])
+            resolve(posts)
+        } else {
+            reject()
+        }
     })
 }
 

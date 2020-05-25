@@ -72,4 +72,12 @@ const viewCreateScreen = (req, res) => {
     })
  }
 
- module.exports = {viewCreateScreen, create, viewPost, viewEditScreen, editPost, deletePost}
+ const search = (req, res) => {
+    Post.search(req.body.searchTerm).then( posts => {
+        res.json(posts)
+    }).catch( () => {
+        res.json([])
+    })
+ }
+
+ module.exports = {viewCreateScreen, create, viewPost, viewEditScreen, editPost, deletePost, search}
