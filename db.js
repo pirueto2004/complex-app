@@ -29,5 +29,6 @@ mongodb.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology: true}, (err, 
     const app = require('./app')
 
     //Once MongoDB establishes a connection, server starts listening on port PORT
+    // app.listen(port, () => console.log(`Server listening on PORT ${port}`))
     app.listen(port, () => console.log(`Server listening on PORT ${port}`))
 })

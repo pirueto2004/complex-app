@@ -2,18 +2,18 @@ const path = require('path')
 const webpack = require('webpack')
 
 module.exports = {
-  entry: './frontend-js/main.js',
+  entry: ['babel-polyfill', './frontend-js/main.js'],
   output: {
     filename: 'main-bundled.js',
-    path: path.resolve(__dirname, 'public'),
-    sourceMapFilename: "main-bundled.js.map"
+    path: path.resolve(__dirname, 'public')
+    // sourceMapFilename: "main-bundled.js.map"
   },
-  mode: "none",
+  mode: "production",
   devtool: "source-map",
   devServer: {
-      contentBase: './public',
-      open: true
-  },
+    contentBase: './public',
+    open: true
+ },
   module: {
     rules: [
       {
@@ -27,5 +27,8 @@ module.exports = {
         }
       }
     ]
-  }
+  },
+  target: 'node',
+  node: {global: false, buffer: true},
 }
+

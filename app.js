@@ -11,6 +11,10 @@ const   express = require('express'),
 //Require the sanitize-html package
         sanitizeHTML = require('sanitize-html')
 
+const Buffer = require('buffer/').Buffer
+
+module.exports = Buffer
+
 //Create our express server
 const app = express()
 
@@ -74,4 +78,33 @@ app.set('view engine', 'ejs')
 //Tell our app to use the router for receiving GET requests to the base url (home page)
 app.use('/', router)
 
-module.exports = app
+//Create a server for our app
+const server = require('http').createServer(app)
+
+// // // //Require the socket connection  
+const io = require('socket.io')(server)
+
+io.use( (socket, next) => {
+    sessionOptions(socket.request, socket.request.res, next)
+})
+
+io.on('connection', socket => {
+    if (socket.request.session.user) {
+        let user = socket.request.session.user
+
+        socket.emit('welcome', {username: user.username, avatar: user.avatar})
+
+        socket.on('chatMessageFromBrowser', data => {
+            // console.log(data.message)
+            //Broadcast the message to all other connected clients, including the client that sent it.
+            // io.emit('chatMessageFromServer', {message: data.message, username: user.username, avatar: user.avatar})
+
+            //Broadcast the message to all other connected clients, NOT including the client that sent it.
+            socket.broadcast.emit('chatMessageFromServer', {message: sanitizeHTML(data.message, {allowedTags: [], allowedAttributes: {}}), username: user.username, avatar: user.avatar})
+        })
+    }
+})
+
+// module.exports = app
+
+module.exports = server
