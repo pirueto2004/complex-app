@@ -84,6 +84,7 @@ const profilePostsScreen = (req, res) => {
     //Ask our post model for posts by a certain author id
     Post.findByAuthorId(req.profileUser._id).then( (posts) => {
         res.render('profile', {
+            title: `Profile for ${req.profileUser.username}`,
             currentPage: "posts",
             posts: posts,
             profileUsername: req.profileUser.username,

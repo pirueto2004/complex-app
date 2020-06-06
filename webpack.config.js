@@ -6,10 +6,8 @@ module.exports = {
   output: {
     filename: 'main-bundled.js',
     path: path.resolve(__dirname, 'public')
-    // sourceMapFilename: "main-bundled.js.map"
   },
   mode: "production",
-  devtool: "source-map",
   devServer: {
     contentBase: './public',
     open: true
