@@ -9,7 +9,9 @@ const   express = require('express'),
 //Require the markdown package
         markdown = require('marked'),
 //Require the sanitize-html package
-        sanitizeHTML = require('sanitize-html')
+        sanitizeHTML = require('sanitize-html'),
+//Require the csurf package
+        csrf = require('csurf')
 
 const Buffer = require('buffer/').Buffer
 
@@ -75,8 +77,28 @@ app.use(express.static('public'))
 app.set('views', 'views')
 app.set('view engine', 'ejs')
 
+//Cross-Site Request Forgery validation
+app.use(csrf())
+
+//Middlewares
+app.use( (req, res, next) => {
+    res.locals.csrfToken = req.csrfToken()
+    next()
+})
+
 //Tell our app to use the router for receiving GET requests to the base url (home page)
 app.use('/', router)
+
+app.use( (err, req, res, next) => {
+    if (err) {
+        if (err.code == "EBADCSRFTOKEN") {
+            req.flash('errors', "Cross Site Request Forgery detected.")
+            req.session.save( () => res.redirect('/'))
+        } else {
+            res.render("404")
+        }
+    }
+})
 
 //Create a server for our app
 const server = require('http').createServer(app)

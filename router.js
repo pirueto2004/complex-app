@@ -15,12 +15,11 @@ const followController = require('./controllers/followController')
 
 //user related Routes
 router.get('/', userController.home)
-
 router.post('/register', userController.register)
-
 router.post('/login', userController.login)
-
 router.post('/logout', userController.logout)
+router.post('/doesUsernameExist', userController.doesUsernameExist)
+router.post('/doesEmailExist', userController.doesEmailExist)
 
 //post related Routes
 router.get('/create-post', userController.mustBeLoggedIn, postController.viewCreateScreen)

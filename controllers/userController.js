@@ -179,6 +179,19 @@ const profileFollowingScreen = async (req, res) => {
     }
 }
 
+const doesUsernameExist = (req, res) => {
+    User.findByUsername(req.body.username).then( () => {
+        res.json(true)
+    }).catch( () => {
+        res.json(false)
+    })
+}
 
-module.exports = { login, logout, register, home, mustBeLoggedIn, ifUserExists, profilePostsScreen, sharedProfileData, profileFollowersScreen, profileFollowingScreen }
+const doesEmailExist = async (req, res) => {
+    let emailExists = await User.doesEmailExist(req.body.email)
+    res.json(emailExists)
+}
+
+
+module.exports = { login, logout, register, home, mustBeLoggedIn, ifUserExists, profilePostsScreen, sharedProfileData, profileFollowersScreen, profileFollowingScreen, doesUsernameExist, doesEmailExist }
 
