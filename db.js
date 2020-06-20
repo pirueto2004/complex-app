@@ -18,7 +18,7 @@ const port = process.env.PORT
 const connectionString = process.env.CONNECTIONSTRING
 
 //if there's a shell environment variable named MONGODB_URI (deployed), use it; otherwise, connect to localhost
-const dbUrl = process.env.MONGODB_URI || connectionString;
+const dbUrl = connectionString || process.env.MONGODB_URI
 
 //Connecting our app to mongoDB Atlas
 mongodb.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) => {
