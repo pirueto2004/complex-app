@@ -20,6 +20,15 @@ module.exports = Buffer
 //Create our express server
 const app = express()
 
+//Always add the following boilerplate code to your app for enabling the user request to be accessible from the req.body object
+app.use(express.urlencoded({extended: false}))
+
+//Always add the following boilerplate code to your app for enabling the asyncronous requests to be accessible from the req.body object
+app.use(express.json())
+
+//API ROUTES
+app.use('/api', require('./router-api'))
+
 //Configure session
 let sessionOptions = session({
     secret: "JavaScript is soooooo coooool",
@@ -63,12 +72,6 @@ app.use( function(req, res, next) {
 
 //Require the router file
 const router = require('./router')
-
-//Always add the following boilerplate code to your app for enabling the user request to be accessible from the req.body object
-app.use(express.urlencoded({extended: false}))
-
-//Always add the following boilerplate code to your app for enabling the asyncronous requests to be accessible from the req.body object
-app.use(express.json())
 
 //Tell express to make the public folder accessible
 app.use(express.static('public'))

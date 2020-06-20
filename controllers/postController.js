@@ -16,6 +16,17 @@ const viewCreateScreen = (req, res) => {
     })
  }
 
+ //API method
+ const apiCreate = (req, res) => {
+    let post = new Post(req.body, req.apiUser._id)
+    //create returns a promise
+    post.create().then( (newId) => {
+       res.json("Congrats!")
+    }).catch( (errors) => {
+        res.json(errors)
+    })
+ }
+
  const viewPost = async (req, res) => {
     try {
         let post = await Post.findPostById(req.params.id, req.visitorId)
@@ -72,6 +83,15 @@ const viewCreateScreen = (req, res) => {
     })
  }
 
+ //API method
+ const apiDelete = (req, res) => {
+    Post.delete(req.params.id, req.apiUser._id).then( () => {
+        res.json("Success!")
+    }).catch( () => {
+        res.json("You do not have permission to perfom that action.")
+    })
+ }
+
  const search = (req, res) => {
     Post.search(req.body.searchTerm).then( posts => {
         res.json(posts)
@@ -80,4 +100,13 @@ const viewCreateScreen = (req, res) => {
     })
  }
 
- module.exports = {viewCreateScreen, create, viewPost, viewEditScreen, editPost, deletePost, search}
+ module.exports = {
+                    viewCreateScreen, 
+                    create, 
+                    viewPost, 
+                    viewEditScreen, 
+                    editPost, 
+                    deletePost, 
+                    search,
+                    apiCreate,
+                    apiDelete}

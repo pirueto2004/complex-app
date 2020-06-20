@@ -1,8 +1,20 @@
 const User = require('../models/User')
 const Post = require('../models/Post')
 const Follow = require('../models/Follow')
+const jsonWT = require('jsonwebtoken')
 
 //ES6 syntax
+
+//API method
+const apiGetPostsByUsername = async (req, res) => {
+    try {
+        let authorDoc = await User.findByUsername(req.params.username)
+        let posts = await Post.findByAuthorId(authorDoc._id)
+        res.json(posts)
+    } catch {
+        res.json("Sorry, invalid user requested.")
+    }
+}
 
 const mustBeLoggedIn = (req, res, next) => {
     //There is a session with a user looged in
@@ -16,6 +28,19 @@ const mustBeLoggedIn = (req, res, next) => {
         })
     }
 }
+
+//API method
+const apiMustBeLoggedIn = (req, res, next) => {
+   try {
+        req.apiUser = jsonWT.verify(req.body.token, process.env.JWTSECRET)
+        next()
+   } catch {
+        res.json("Sorry, you must provided a valid token.")
+   }
+}
+
+
+
 
 const login = (req, res) => { 
     let user = new User(req.body)
@@ -32,6 +57,17 @@ const login = (req, res) => {
         req.session.save( () => {
             res.redirect('/')
         })
+    })
+}
+
+//API method
+const apiLogin = (req, res) => {
+    let user = new User(req.body)
+    //Making a Promise
+    user.login().then( () => {
+        res.json(jsonWT.sign({_id: user.data._id}, process.env.JWTSECRET, {expiresIn: '365d'}))
+    }).catch( (err) => {
+        res.json("Sorry, your values are not correct.")
     })
 }
 
@@ -193,5 +229,19 @@ const doesEmailExist = async (req, res) => {
 }
 
 
-module.exports = { login, logout, register, home, mustBeLoggedIn, ifUserExists, profilePostsScreen, sharedProfileData, profileFollowersScreen, profileFollowingScreen, doesUsernameExist, doesEmailExist }
+module.exports = {  login, 
+                    logout, 
+                    register, 
+                    home,
+                    mustBeLoggedIn, 
+                    ifUserExists, 
+                    profilePostsScreen, 
+                    sharedProfileData, 
+                    profileFollowersScreen, 
+                    profileFollowingScreen, 
+                    doesUsernameExist, 
+                    doesEmailExist,
+                    apiLogin,
+                    apiMustBeLoggedIn,
+                    apiGetPostsByUsername }
 
