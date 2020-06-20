@@ -24,7 +24,7 @@ const dbUrl = connectionString || process.env.MONGODB_URI
 mongodb.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) => {
 
     //Exports our MongoDB database object
-    module.exports = client
+    module.exports = client.db()
 
     //Require the app to start listening
     const app = require('./app')
