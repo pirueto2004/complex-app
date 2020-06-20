@@ -5,13 +5,13 @@ dotenv.config()
 const mongodb = require('mongodb')
 
 //Store Database in a variable
-const database_name  = process.env.DATABASE_NAME
+// const database_name  = process.env.DATABASE_NAME
 
 //Port for the server to listen
 const port = process.env.PORT
 
 //Environment variable for mongoDB database password
-const mongodbPassword = process.env.MONGOPASSWORD
+// const mongodbPassword = process.env.MONGOPASSWORD
 
 //Connection string
 // const connectionString = `mongodb+srv://todoAppUser:${mongodbPassword}@jbcluster-v5kqr.mongodb.net/${database_name}?retryWrites=true&w=majority`
