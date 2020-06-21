@@ -8,7 +8,7 @@ const mongodb = require('mongodb')
 // const database_name  = process.env.DATABASE_NAME
 
 //Port for the server to listen
-const port = process.env.PORT
+const port = process.env.PORT || 3000
 
 //Environment variable for mongoDB database password
 // const mongodbPassword = process.env.MONGOPASSWORD
