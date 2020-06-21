@@ -1,5 +1,5 @@
-const   postsCollection = require('../db').collection('posts'),
-        followsCollection = require('../db').collection('follows'),
+const   postsCollection = require('../db').db().collection('posts'),
+        followsCollection = require('../db').db().collection('follows'),
         //Require ObjectID from mongodb
         ObjectID = require('mongodb').ObjectID,
         User = require('./User'),
