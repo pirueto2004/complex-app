@@ -15,10 +15,10 @@ const port = process.env.PORT || 3000
 
 //Connection string
 // const connectionString = `mongodb+srv://todoAppUser:${mongodbPassword}@jbcluster-v5kqr.mongodb.net/${database_name}?retryWrites=true&w=majority`
-// const connectionString = process.env.CONNECTIONSTRING
+const connectionString = process.env.CONNECTIONSTRING
 
 //if there's a shell environment variable named MONGODB_URI (deployed), use it; otherwise, connect to localhost
-const dbUrl = process.env.MONGODB_URI 
+const dbUrl = process.env.MONGODB_URI || connectionString
 
 //Connecting our app to mongoDB Atlas
 mongodb.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) => {
