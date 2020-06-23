@@ -8,17 +8,17 @@ const mongodb = require('mongodb')
 // const database_name  = process.env.DATABASE_NAME
 
 //Port for the server to listen
-const port = process.env.PORT || 3000
+let port = process.env.PORT || 3000
 
 //Environment variable for mongoDB database password
 // const mongodbPassword = process.env.MONGOPASSWORD
 
 //Connection string
 // const connectionString = `mongodb+srv://todoAppUser:${mongodbPassword}@jbcluster-v5kqr.mongodb.net/${database_name}?retryWrites=true&w=majority`
-const connectionString = process.env.CONNECTIONSTRING
+let connectionString = process.env.CONNECTIONSTRING
 
 //if there's a shell environment variable named MONGODB_URI (deployed), use it; otherwise, connect to localhost
-const dbUrl = process.env.MONGODB_URI || connectionString
+let dbUrl = process.env.MONGODB_URI || connectionString
 // const dbUrl = connectionString
 
 //Connecting our app to mongoDB Atlas
