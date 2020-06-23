@@ -2,14 +2,16 @@
   "name": "complex-app",
   "version": "1.0.0",
   "engines": {
-    "node": "12.x"
+    "node": "12.x",
+    "npm": "6.x"
   },
   "description": "",
   "main": "db.js",
   "scripts": {
     "watch": "start nodemon db --ignore frontend-js --ignore public/ && start webpack --watch",
     "build": "webpack --mode production",
-    "start": "nodemon db.js"
+    "start": "nodemon db.js",
+    "heroku-postbuild": "npm run build"
   },
   "keywords": [],
   "author": "",
