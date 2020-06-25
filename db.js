@@ -15,7 +15,7 @@ let port = process.env.PORT
 
 //Connection string
 // const connectionString = `mongodb+srv://todoAppUser:${mongodbPassword}@jbcluster-v5kqr.mongodb.net/${database_name}?retryWrites=true&w=majority`
-let connectionString = process.env.CONNECTIONSTRING
+const MONGODB_URI = process.env.CONNECTIONSTRING
 
 //if there's a shell environment variable named MONGODB_URI (deployed), use it; otherwise, connect to MongoDB Atlas database
 // let dbUrl = process.env.MONGODB_URI || connectionString
@@ -23,7 +23,7 @@ let connectionString = process.env.CONNECTIONSTRING
 
 
 //Connecting our app to mongoDB Atlas
-mongodb.connect(connectionString, {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) => {
+mongodb.connect(MONGODB_URI, {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) => {
 
     
     //Exports our MongoDB database object
