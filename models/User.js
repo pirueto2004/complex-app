@@ -9,6 +9,7 @@ const validator = require('validator')
 
 //Require the hashing package md5
 const md5 = require('md5')
+const { db } = require('../db')
 
 //Constructor function for User
 let User = function(data, getAvatar) {

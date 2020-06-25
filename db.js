@@ -8,7 +8,7 @@ const mongodb = require('mongodb')
 // const database_name  = process.env.DATABASE_NAME
 
 //Port for the server to listen
-let port = process.env.PORT || 3000
+let port = process.env.PORT
 
 //Environment variable for mongoDB database password
 // const mongodbPassword = process.env.MONGOPASSWORD
@@ -18,12 +18,14 @@ let port = process.env.PORT || 3000
 let connectionString = process.env.CONNECTIONSTRING
 
 //if there's a shell environment variable named MONGODB_URI (deployed), use it; otherwise, connect to MongoDB Atlas database
-let dbUrl = process.env.MONGODB_URI || connectionString
+// let dbUrl = process.env.MONGODB_URI || connectionString
 // const dbUrl = connectionString
 
-//Connecting our app to mongoDB Atlas
-mongodb.connect(dbUrl, {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) => {
 
+//Connecting our app to mongoDB Atlas
+mongodb.connect(connectionString, {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) => {
+
+    
     //Exports our MongoDB database object
     module.exports = client
 
