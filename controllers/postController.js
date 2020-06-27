@@ -1,4 +1,8 @@
 const Post = require('../models/Post')
+const sendgrid = require('@sendgrid/mail')
+
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY)
+
 const viewCreateScreen = (req, res) => {
     // res.render('create-post', {username: req.session.user.username, avatar: req.session.user.avatar}) **no longer need to export session date from here
     res.render('create-post')
@@ -6,8 +10,17 @@ const viewCreateScreen = (req, res) => {
 
  const create = (req, res) => {
     let post = new Post(req.body, req.session.user._id)
+    
     //create returns a promise
     post.create().then( (newId) => {
+        const msg = {
+            to: 'juliobell2014@gmail.com',
+            from: 'info@abcnails.com',
+            subject: 'Congrats on creating a new post!',
+            text: 'You did a great job of creating a post.',
+            html: `<strong>${req.session.user.username} just created a post.</strong>`
+        }
+        sendgrid.send(msg)
         req.flash('success', 'New post successfully created.')
         req.session.save( () => res.redirect(`/post/${newId}`))
     }).catch( (errors) => {
