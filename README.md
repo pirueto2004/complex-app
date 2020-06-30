@@ -6,7 +6,7 @@ This app was created as part of the Udemy "Learn JavaScript: Full-Stack from Scr
 
 This project is aimed basically to create a system for sharing posts. Every user has to sign up for an account in order to be able to create, publish, edit, and  delete their posts. Users can follow other users and be followed by them as well. A real-time chat feature is included in the app. Every time a user creates a post the administrator receives an email with the username that created the post.
 
-![](public/images/screen-capture.png)
+![Results](public/images/screen-capture.png)
 
 The app is built in the Node.js environment. We used Express to organize our app on the server side. For the back-end we used a cloud-based MongoDB database created in MongoDB Atlas. EJS Templating Engine is used to generate the HTML markup. The chat feature was built with Socket.io and for the email feature we use SendGrid. 
 
